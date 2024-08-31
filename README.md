@@ -23,3 +23,54 @@ To install Envelope, use the following command:
 $ go get github.com/eugenetriguba/envelope
 ```
 
+## Usage
+
+Envelope supports the following types to load environment variables into for a Go struct:
+- `string`
+- `bool`
+- `float32`, `float64`
+- `int`, `int8`, `int16`, `int32`, `int64`
+- `uint`, `uint8`, `uint16`, `uint32`, `uint64`
+
+Given a struct with compatible types, we can use `LoadFromEnv` to populate the struct.
+
+`main.go`
+```go
+package main
+
+import (
+    "fmt"
+    "os"
+
+    "github.com/eugenetriguba/envelope"
+)
+
+type ExampleStruct struct {
+    Field string `env:"EXAMPLE_FIELD"`
+}
+
+func main() {
+    var example ExampleStruct
+    err := envelope.LoadFromEnv(&example)
+    if err != nil {
+        fmt.Errorf("%w\n", err)
+        os.Exit(1)
+    }
+    fmt.Printf("Field value: %s\n", example.Field)
+}
+```
+
+Now, we can run the program to see what `Field` is set to:
+
+```
+$ go run main.go
+Field value:
+```
+
+When we run it without an environment variable set, we can see it is the default Go value for that type (in this case, an empty string). However, when we set the `EXAMPLE_FIELD` environment variable, we can see the struct's `Field` field has the value set as expected:
+
+```
+$ EXAMPLE_FIELD=123 go run main.go
+Field value: 123
+```
+
